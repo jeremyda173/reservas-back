@@ -1,0 +1,35 @@
+{
+  "name": "reservas-back",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeremyda173/reservas-back.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jeremyda173/reservas-back/issues"
+  },
+  "homepage": "https://github.com/jeremyda173/reservas-back#readme",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "firebase": "^12.0.0",
+    "firebase-admin": "^13.4.0",
+    "fireorm": "^0.23.3",
+    "reflect-metadata": "^0.1.14"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
