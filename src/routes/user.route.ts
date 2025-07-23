@@ -14,4 +14,20 @@ router.post(
     '/login',
 controller.loginUser.bind(controller))
 
+router.get(
+    '/',
+controller.getUser.bind(controller))
+
+router.get(
+    '/:id',
+controller.getUserById.bind(controller))
+
+router.patch(
+    '/:id',
+controller.updateUser.bind(controller))
+
+router.delete(
+    '/:id',
+controller.deleteUser.bind(controller))
+
 export default router;
