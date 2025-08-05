@@ -79,6 +79,18 @@ export class userController {
 
     try{
       const allUser = await this.userRepository.find();
+
+     const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+
+      const offset = (page - 1) * limit;
+      const paginatedInventory = allUser.slice(offset, offset + limit);
+      res.status(200).json({
+        limit,
+        page,
+        total: allUser.length,
+        data: paginatedInventory,
+      }); 
       res.status(200).json(allUser)
     }catch(err){
       res.status(500).json({message: "Error al obtener usuarios", error: err})
