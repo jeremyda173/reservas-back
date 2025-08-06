@@ -25,12 +25,24 @@ export class TableController {
     async getAllTables(req: Request, res: Response): Promise<void> {
         try {
             const resTable = await this.repoTable.find()
+
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+
+            const offset = (page - 1) * limit;
+
+            const paginatedInventory = resTable.slice(offset, offset + limit);
+            res.status(200).json({
+              limit,
+              page,
+              total: resTable.length,
+              data: paginatedInventory,})
             if(!resTable) {
                 res.status(404).json({message: "No se encontraron mesas"})
                 return;
             }
             res.status(200).json({resTable})
-        } catch (err) {
+        }catch (err) {
             res.status(500).json({message: "Error al obtener las mesas", error: err})
         }
     }

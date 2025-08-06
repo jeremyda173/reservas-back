@@ -25,6 +25,19 @@ export class ReservationController {
     async getAllReservations(req: Request, res: Response): Promise<void>{
         try {
             const resReservation = await this.repoReservation.find()
+
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+
+            const offset = (page - 1) * limit;
+
+            const paginatedInventory = resReservation.slice(offset, offset + limit);
+            res.status(200).json({
+              limit,
+              page,
+              total: resReservation.length,
+              data: paginatedInventory,
+            });
             if(!resReservation) {
                 res.status(404).json({message: "No se encontraron las reservaciones"});
                 return;
