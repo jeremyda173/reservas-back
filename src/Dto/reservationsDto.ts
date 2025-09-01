@@ -5,6 +5,6 @@ export interface CreateReservationDto {
     date: Date;
     start_Time: Date;
     end_Time: Date;
-    status: Date;
+    status: string;
     created_at: Date;
 }
