@@ -3,7 +3,6 @@ import { User } from "../models/user";
 import { Request, Response } from 'express';
 import { CreateUserDto } from "../Dto/userDto";
 import bcrypt from "bcryptjs"
-import { error } from "console";
 import { instanceToPlain, plainToInstance } from "class-transformer";
 
 export class userController { 

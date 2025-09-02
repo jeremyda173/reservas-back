@@ -14,7 +14,7 @@ export class Reservations{
 
     end_Time!: Date;
 
-    status!: Date;
+    status!: string;
 
     created_at!: Date;
 }
