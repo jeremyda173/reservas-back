@@ -14,6 +14,11 @@ router.post(
     '/login',
 controller.loginUser.bind(controller))
 
+router.post(
+  '/logout',
+  controller.logoutUser.bind(controller)
+)
+
 router.get(
     '/',
 controller.getUser.bind(controller))
