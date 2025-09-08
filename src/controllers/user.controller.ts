@@ -68,6 +68,16 @@ async loginUser(req: Request, res: Response): Promise<void> {
     res.status(500).json({ message: "Error en el login", error: error instanceof Error ? error.message : error });
   }
 }
+
+  async logoutUser(req: Request, res:Response): Promise <void>{
+    try {
+      res.clearCookie('token'); 
+      res.status(200).json({ message: 'Sesión cerrada con éxito' });
+    } catch (error) {
+      res.status(500).json({ message: 'Error al cerrar sesión' });
+    }
+  }
+
   async getUser(req: Request, res:Response): Promise <void>{
 
     try{
