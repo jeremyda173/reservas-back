@@ -27,6 +27,4 @@ export interface CreateTableDto {
   inicio?: string | Date;
 }
 
-export interface UpdateMesaDto extends Partial<CreateTableDto> {
-  id: string;
-}
+export interface UpdateMesaDto extends Partial<CreateTableDto> {}
