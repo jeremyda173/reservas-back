@@ -60,7 +60,7 @@ async loginUser(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email }, 'your-secret-key', { expiresIn: '1m' });
+    const token = jwt.sign({ id: user.id, email: user.email }, 'your-secret-key', { expiresIn: '30m' });
     const { password_hash, ...userData } = user;
 
     res.status(200).json({ message: "Inicio de sesión exitoso", user: userData, token });
