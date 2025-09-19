@@ -1,20 +1,20 @@
 import { Collection } from "fireorm";
 
-@Collection('Reservations')
+export type ReservationStatus = "pendiente" | "confirmada" | "cancelada" | "completada";
 
-export class Reservations{
+@Collection("Reservations")
+export class Reservations {
+  id!: string;
 
-    id!: string;
+  user_Id!: string;
 
-    user_Id!: string;
+  date!: Date;
 
-    date!: Date;
+  start_Time!: Date;
 
-    start_Time!: Date;
+  end_Time!: Date;
 
-    end_Time!: Date;
+  status!: ReservationStatus;;
 
-    status!: string;
-
-    created_at!: Date;
+  created_at!: Date;
 }
