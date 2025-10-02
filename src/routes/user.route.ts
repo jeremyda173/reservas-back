@@ -23,6 +23,11 @@ router.get(
     '/',
 controller.getUser.bind(controller))
 
+router.post(
+  '/refresh-token',
+  controller.refreshToken.bind(controller)
+)
+
 router.get(
     '/:id',
 controller.getUserById.bind(controller))
