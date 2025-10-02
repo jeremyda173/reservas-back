@@ -7,6 +7,8 @@ import bcrypt from "bcryptjs";
 import { instanceToPlain, plainToInstance } from "class-transformer";
 import { pickFields } from "../utils";
 
+const JWT_SECRET = "kkkall2ijfnnADFASNVACVPJEPQSVPBVPJFPIBQAVFPIQPEPAN";
+
 export class userController {
   private userRepository = getRepository(User);
 
@@ -23,9 +25,10 @@ export class userController {
         .whereEqualTo("email", userDto.email)
         .find();
       if (existingEmail.length > 0) {
-        res
-          .status(400)
-          .json({ message: "Usuario existente con este email", data: userDto });
+        res.status(400).json({
+          message: "Usuario existente con este email",
+          data: userDto,
+        });
         return;
       }
 
@@ -75,21 +78,53 @@ export class userController {
         return;
       }
 
-      const token = jwt.sign(
+      const accessToken = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
-        "kkkall2ijfnnADFASNVACVPJEPQSVPBVPJFPIBQAVFPIQPEPAN",
-        { expiresIn: "30m" }
+        JWT_SECRET,
+        { expiresIn: "20m" }
       );
 
+      const refreshToken = jwt.sign({ id: user.id }, JWT_SECRET, {
+        expiresIn: "20m",
+      });
+
       const { password_hash, ...userData } = user;
-      res
-        .status(200)
-        .json({ message: "Inicio de sesión exitoso", user: userData, token });
+      res.status(200).json({
+        message: "Inicio de sesión exitoso",
+        user: userData,
+        accessToken,
+        refreshToken,
+      });
     } catch (error) {
       res.status(500).json({
         message: "Error en el login",
         error: error instanceof Error ? error.message : error,
       });
+    }
+  }
+
+  async refreshToken(req: Request, res: Response): Promise<void> {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      res.status(401).json({ message: "Refresh token requerido" });
+      return;
+    }
+
+    try {
+      const payload = jwt.verify(refreshToken, JWT_SECRET) as any;
+
+      const newAccessToken = jwt.sign(
+        { id: payload.id, email: payload.email, role: payload.role },
+        JWT_SECRET,
+        { expiresIn: "20m" }
+      );
+
+      res.json({ accessToken: newAccessToken });
+    } catch (error) {
+      res
+        .status(403)
+        .json({ message: "Refresh token inválido o expirado", error });
     }
   }
 
@@ -147,9 +182,7 @@ export class userController {
         data,
       });
     } catch (err) {
-      res
-        .status(500)
-        .json({ message: "Error al obtener usuarios", error: err });
+      res.status(500).json({ message: "Error al obtener usuarios", error: err });
     }
   }
 
