@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { userController } from "../controllers/user.controller";
-
+import { uploadSingleImage } from "../config/multer";
 
 const router = Router();
 
@@ -35,6 +35,20 @@ controller.getUserById.bind(controller))
 router.patch(
     '/:id',
 controller.updateUser.bind(controller))
+
+// Ruta para subir imagen de usuario
+router.post(
+    '/:id/upload-image',
+    uploadSingleImage,
+    controller.uploadUserImage.bind(controller)
+)
+
+// Ruta para actualizar usuario con imagen
+router.patch(
+    '/:id/update-with-image',
+    uploadSingleImage,
+    controller.updateUserWithImage.bind(controller)
+)
 
 router.delete(
     '/:id',

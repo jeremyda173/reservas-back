@@ -3,6 +3,7 @@ import cors from "cors"
 import user_router from "./routes/user.route"
 import table_router from "./routes/table.route"
 import reservation_router from './routes/reservation.route'
+import path from "path"
 
 const app = express();
 
@@ -14,6 +15,9 @@ app.use(cors({
 }))
 
 app.use(express.json())
+
+// Servir archivos estáticos desde la carpeta uploads
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
 app.get("/", (_, res) => {
     res.send("ApI funcionando correctamente con Typescript y firebase");

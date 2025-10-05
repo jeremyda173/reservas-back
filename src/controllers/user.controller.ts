@@ -5,7 +5,7 @@ import { CreateUserDto } from "../Dto/userDto";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { instanceToPlain, plainToInstance } from "class-transformer";
-import { pickFields } from "../utils";
+import { validate } from "class-validator";
 
 const JWT_SECRET = "kkkall2ijfnnADFASNVACVPJEPQSVPBVPJFPIBQAVFPIQPEPAN";
 
@@ -14,7 +14,21 @@ export class userController {
 
   async createUser(req: Request, res: Response): Promise<void> {
     try {
-      const userDto: CreateUserDto = req.body;
+      const userDto = plainToInstance(CreateUserDto, req.body);
+      
+      const errors = await validate(userDto);
+      if (errors.length > 0) {
+        const errorMessages = errors.map(error => {
+          const constraints = error.constraints;
+          return constraints ? Object.values(constraints)[0] : 'Error de validación';
+        });
+        
+        res.status(400).json({ 
+          message: "Error de validación", 
+          errors: errorMessages 
+        });
+        return;
+      }
 
       if (!userDto.email || !userDto.password_hash) {
         res.status(400).json({ message: "Email y contraseña son obligatorios." });
@@ -32,8 +46,7 @@ export class userController {
         return;
       }
 
-      const password = userDto.password_hash;
-      const passwordHashed = await bcrypt.hash(password, 10);
+      const passwordHashed = await bcrypt.hash(userDto.password_hash, 10);
       userDto.password_hash = passwordHashed;
 
       const now = new Date();
@@ -43,6 +56,7 @@ export class userController {
       userDto.permissions = userDto.permissions || [];
       userDto.gender = userDto.gender || "other";
       userDto.address = userDto.address || "";
+      userDto.image = userDto.image || "";
 
       const user = await this.userRepository.create(userDto);
       const userInstance = plainToInstance(CreateUserDto, user);
@@ -145,40 +159,20 @@ export class userController {
       const limit = Math.max(parseInt(req.query.limit as string) || 10, 1);
       const offset = (page - 1) * limit;
 
-      const columnsRaw = (req.query.columns as string) || "";
-      const requestedCols = columnsRaw
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-
-      const ALLOWED = new Set([
-        "id",
-        "email",
-        "name",
-        "phone",
-        "cedula",
-        "image",
-        "created_at",
-        "updated_at",
-        "role",
-        "gender",
-        "address",
-        "permissions",
-      ]);
-      const safeCols = requestedCols.filter((c) => ALLOWED.has(c));
-
       const total = allUser.length;
       const pageSlice = allUser.slice(offset, offset + limit);
 
-      const data = pageSlice.map((u) =>
-        pickFields(u, safeCols.length ? safeCols : undefined)
-      );
+      const data = pageSlice.map((u) => {
+        if (!u.permissions) {
+          u.permissions = [];
+        }
+        return u;
+      });
 
       res.status(200).json({
         page,
         limit,
         total,
-        columns: safeCols.length ? safeCols : "all",
         data,
       });
     } catch (err) {
@@ -193,6 +187,10 @@ export class userController {
       if (!user.id) {
         res.status(404).json({ message: "Usuario no encontrado." });
         return;
+      }
+
+      if (!user.permissions) {
+        user.permissions = [];
       }
 
       res.status(200).json(user);
@@ -232,6 +230,75 @@ export class userController {
       res
         .status(500)
         .json({ message: "Error al eliminar el usuario", error: err });
+    }
+  }
+
+  async uploadUserImage(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.params.id;
+      
+      if (!req.file) {
+        res.status(400).json({ message: "No se proporcionó ninguna imagen" });
+        return;
+      }
+
+      const user = await this.userRepository.findById(userId);
+      if (!user.id) {
+        res.status(404).json({ message: "Usuario no encontrado" });
+        return;
+      }
+
+      const imagePath = `/uploads/users/${req.file.filename}`;
+      user.image = imagePath;
+      user.updated_at = new Date();
+
+      await this.userRepository.update(user);
+
+      res.status(200).json({
+        message: "Imagen actualizada correctamente",
+        imageUrl: imagePath,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image
+        }
+      });
+    } catch (err) {
+      res.status(500).json({ 
+        message: "Error al subir la imagen", 
+        error: err instanceof Error ? err.message : err 
+      });
+    }
+  }
+
+  async updateUserWithImage(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.params.id;
+      const userData = req.body;
+      
+      const user = await this.userRepository.findById(userId);
+      if (!user.id) {
+        res.status(404).json({ message: "Usuario no encontrado" });
+        return;
+      }
+
+      if (req.file) {
+        userData.image = `/uploads/users/${req.file.filename}`;
+      }
+
+      const updated = Object.assign(user, userData, { updated_at: new Date() });
+      await this.userRepository.update(updated);
+
+      res.status(200).json({
+        message: "Usuario actualizado correctamente",
+        user: updated
+      });
+    } catch (err) {
+      res.status(500).json({
+        message: "Error al actualizar el usuario",
+        error: err instanceof Error ? err.message : err
+      });
     }
   }
 }

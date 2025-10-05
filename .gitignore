@@ -9,6 +9,9 @@ logs
 *.log
 npm-debug.log*
 
+# Uploads
+uploads/
+
 .DS_Store
 *.swp
 .idea/
