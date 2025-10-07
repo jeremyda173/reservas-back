@@ -3,6 +3,10 @@ import cors from "cors"
 import user_router from "./routes/user.route"
 import table_router from "./routes/table.route"
 import reservation_router from './routes/reservation.route'
+import admin_router from './routes/admin.route'
+import role_router from './routes/role.route'
+import init_router from './routes/init.route'
+import test_router from './routes/test.route'
 import path from "path"
 
 const app = express();
@@ -25,5 +29,9 @@ app.get("/", (_, res) => {
 app.use("/user", user_router)
 app.use('/table', table_router)
 app.use('/reservation', reservation_router)
+app.use('/admin', admin_router)
+app.use('/role', role_router)
+app.use('/init', init_router)
+app.use('/test', test_router)
 
 export default app;
