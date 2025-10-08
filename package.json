@@ -6,7 +6,9 @@
     "dev": "ts-node-dev --respawn --transpile-only index.ts",
     "start": "node dist/index.js",
     "build": "tsc",
-    "postinstall": "npm run build"
+    "postinstall": "npm run build",
+    "validate:firebase": "ts-node -e \"require('./src/utils/firebaseValidator').validateFirebaseConfig()\"",
+    "setup:check": "npm run validate:firebase"
   },
   "repository": {
     "type": "git",
