@@ -12,8 +12,12 @@ import path from "path"
 const app = express();
 
 //Cors 
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? process.env.FRONTEND_URL.split(',')
+  : ["http://localhost:3000", "http://localhost:5173"];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || ["http://localhost:3000", "http://localhost:5173"],
+  origin: allowedOrigins,
   methods:  ["GET", "POST", "PUT", "PATCH", "DELETE"],
   credentials: true
 }))
